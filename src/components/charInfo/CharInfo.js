@@ -1,40 +1,141 @@
-import './charInfo.scss';
-import spike from '../../resources/img/spike.jpg';
+import { Component } from 'react';
 
-const CharInfo = () => {
+import JikanService from '../../services/JikanService';
+
+import Spinner from '../spinner/Spinner';
+import ErrorMessage from '../errorMessage/ErrorMessage';
+import Skeleton from '../skeleton/Skeleton';
+
+import './charInfo.scss';
+
+class CharInfo extends Component {
+    
+    state = {
+        char: null,
+        loading: false,
+        error: false
+    }
+
+    jikanService = new JikanService();
+
+    componentDidMount() {
+        this.updateChar();
+    }
+
+    componentDidUpdate(prevProps) {
+        if (this.props.charId !== prevProps.charId) {
+            this.updateChar();
+        }
+    }
+
+        onCharLoaded = (char) => {
+        this.setState({char,
+                loading: false,
+            })
+    }
+
+    onCharLoading = () => {
+        this.setState({
+            loading: true,
+            error: false
+        })
+    }
+
+    onError = () => {
+        this.setState({
+            loading: false,
+            error: true
+        })
+    }
+
+    updateChar = () => {
+        const {charId} = this.props;
+        if (!charId) {
+            return;
+        }
+
+        this.onCharLoading();
+
+        this.jikanService.getCharacter(charId)
+            .then(this.onCharLoaded)
+            .catch(this.onError)
+    }
+
+    render() {
+        const {char, loading, error} = this.state;
+
+        const skeleton = !(error || loading || char) ? <Skeleton/> : null;
+        const errorMessage = error ? <ErrorMessage/> : null;
+        const spinner = loading ? <Spinner/> : null;
+        const content = !(error || loading || !char) ? <View char={char}/> : null;
+
+
+        return (
+            <div className="char__info">
+                {skeleton}
+                {errorMessage}
+                {spinner}
+                {content}
+            </div>
+        )
+    }
+}
+
+const View = ({char}) => {
+    const {name, about, thumbnail, homepage, wiki, anime, manga} = char
+
+    let animeList, mangaList;
+    
+    if (typeof(anime) === 'string') {
+        animeList = anime;
+    } else {
+        animeList = anime.map(item => {
+            return (
+                <li key={item.anime.mal_id} className="char__comics-item">
+                    {item.anime.title}
+                </li>
+            )
+        });
+    }
+
+    if (typeof(manga) === 'string') {
+        mangaList = manga;
+    } else {
+        mangaList = manga.map(item => {
+            return (
+                <li key={item.manga.mal_id} className="char__comics-item">
+                    {item.manga.title}
+                </li>
+            )
+        });
+    }
+
     return (
-        <div className="char__info">
+        <>
             <div className="char__basics">
-                <img src={spike} alt="spike"/>
+                <img src={thumbnail} alt={name}/>
                 <div>
-                    <div className="char__info-name">spike</div>
+                    <div className="char__info-name">{name}</div>
                     <div className="char__btns">
-                        <a href="#" className="button button__main">
+                        <a href={homepage} className="button button__main">
                             <div className="inner">homepage</div>
                         </a>
-                        <a href="#" className="button button__secondary">
+                        <a href={wiki} className="button button__secondary">
                             <div className="inner">Wiki</div>
                         </a>
                     </div>
                 </div>
             </div>
-            <div className="char__descr">
-                Spike Spiegel is a tall and lean 27-year-old bounty hunter born on Mars. The inspiration for Spike is found in martial artist Bruce Lee who uses the martial arts style of Jeet Kune Do as depicted in Session 8, "Waltz For Venus". He has fluffy, dark green hair (which is inspired by Yusaku Matsuda's) and reddish brown eyes, one of which is artificial and lighter than the other. He is usually dressed in a blue leisure suit, with a yellow shirt and Lupin III inspired boots. A flashback in Session 6 revealed it was his fully functioning right eye which was surgically replaced by the cybernetic one (although Spike himself may not have conscious recollection of the procedure since he claims to have lost his natural eye in an "accident"). One theory is that his natural eye may have been lost during the pre-series massacre in which he supposedly "died". 
-            </div>
+            <div className="char__descr">{about}</div>
             <div className="char__comics">Anime:</div>
             <ul className="char__comics-list">
-                <li className="char__comics-item">
-                    	Cowboy Bebop
-                </li>
+                {animeList}
             </ul>
             <div className="char__comics">Manga:</div>
             <ul className="char__comics-list">
-                <li className="char__comics-item">
-                    	Cowboy Bebop
-                </li>
+                {mangaList}
             </ul>
-
-        </div>
+        </>
     )
 }
 

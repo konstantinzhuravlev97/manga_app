@@ -7,6 +7,7 @@ import "./style/style.scss";
 
 // const jikanService = new JikanService();
 
+// jikanService.getCharacter(1).then(res => console.log(res));
 // jikanService.getAllCharacters().then(res => console.log(res));
 
 const container = document.getElementById("root");

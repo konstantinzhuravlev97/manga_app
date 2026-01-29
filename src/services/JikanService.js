@@ -22,22 +22,51 @@ class JikanService {
         return this._transformCharacter(res.data);
     }
 
-    _transformCharacter = (char) => {
-        let descr = char.about;
-        if (descr && descr.length > 0) {
-            if (descr.length > 180) {
-                descr = `${descr.slice(0, 180)}...`;
+    checkDescriptionLength = (item, number) => {
+        let res;
+        if (item) {
+            if (item.length > number) {
+                res = `${item.slice(0, +number)}...`;
+            } else {
+                res = item;
             }
         } else {
-            descr = 'There is no desription for this character';
+            res = 'There is no desription for this character';
         }
+        return res;
+    }
+
+    checkListLength = (item, number) => {
+        let res;
+        if (item && item.length > 0) {
+            if (item.length > number) {
+                res = item.slice(0, number);
+            } else {
+                res = item;
+            }
+        } else {
+            res = 'There is no titles with this character';
+        }
+        return res;
+    }
+
+    _transformCharacter = (char) => {
+        let descr = this.checkDescriptionLength(char.about, 180);
+        let about = this.checkDescriptionLength(char.about, 600);
+
+        let animeList = this.checkListLength(char.anime, 7);
+        let mangaList = this.checkListLength(char.manga, 7);
+
         return {
+            id: char.mal_id,
             name: char.name,
             description: descr,
+            about: about,
             thumbnail: char.images.jpg.image_url,
+            anime: animeList,
+            manga: mangaList,
             homepage: char.url,
             wiki: null,
-            id: char.mal_id
         }
     }
 }

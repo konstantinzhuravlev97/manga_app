@@ -26,8 +26,14 @@ class RandomChar extends Component {
     onCharLoaded = (char) => {
         this.setState({char,
                 loading: false,
-                error: false
             })
+    }
+
+    onCharLoading = () => {
+        this.setState({
+            loading: true,
+            error: false
+        })
     }
 
     onError = () => {
@@ -39,6 +45,7 @@ class RandomChar extends Component {
 
     updateChar = () => {
         const id = Math.floor(Math.random() * (5000 - 1) + 1);
+        this.onCharLoading();
         this.jikanService
             .getCharacter(id)
             .then(this.onCharLoaded)
