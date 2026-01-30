@@ -1,6 +1,7 @@
 
 class JikanService {
     _apiBase = 'https://api.jikan.moe/v4/';
+    _basePage = 1;
 
     getResource = async (url) => {
         let res = await fetch(url);
@@ -12,8 +13,8 @@ class JikanService {
         return await res.json();
     }
 
-    getAllCharacters = async () => {
-        const res = await this.getResource(`${this._apiBase}characters?limit=9`);
+    getAllCharacters = async (page = this._basePage) => {
+        const res = await this.getResource(`${this._apiBase}characters?limit=9&page=${page}`);
         return res.data.map(this._transformCharacter);
     }
 
