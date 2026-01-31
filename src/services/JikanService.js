@@ -1,29 +1,22 @@
+import {useHttp} from '../hooks/http.hook';
 
-class JikanService {
-    _apiBase = 'https://api.jikan.moe/v4/';
-    _basePage = 1;
+const useJikanService = () => {
+    const {loading, error, request, clearError} = useHttp();
 
-    getResource = async (url) => {
-        let res = await fetch(url);
+    const _apiBase = 'https://api.jikan.moe/v4/';
+    const _basePage = 1;
 
-        if (!res.ok) {
-            throw new Error(`Could not fetch ${url}, status: ${res.status}`);
-        }
-
-        return await res.json();
+    const getAllCharacters = async (page = _basePage) => {
+        const res = await request(`${_apiBase}characters?limit=9&page=${page}`);
+        return res.data.map(_transformCharacter);
     }
 
-    getAllCharacters = async (page = this._basePage) => {
-        const res = await this.getResource(`${this._apiBase}characters?limit=9&page=${page}`);
-        return res.data.map(this._transformCharacter);
+    const getCharacter = async (id) => {
+        const res = await request(`${_apiBase}characters/${id}/full`);
+        return _transformCharacter(res.data);
     }
 
-    getCharacter = async (id) => {
-        const res = await this.getResource(`${this._apiBase}characters/${id}/full`);
-        return this._transformCharacter(res.data);
-    }
-
-    checkDescriptionLength = (item, number) => {
+    const checkDescriptionLength = (item, number) => {
         let res;
         if (item) {
             if (item.length > number) {
@@ -37,7 +30,7 @@ class JikanService {
         return res;
     }
 
-    checkListLength = (item, number) => {
+    const checkListLength = (item, number) => {
         let res;
         if (item && item.length > 0) {
             if (item.length > number) {
@@ -51,12 +44,12 @@ class JikanService {
         return res;
     }
 
-    _transformCharacter = (char) => {
-        let descr = this.checkDescriptionLength(char.about, 180);
-        let about = this.checkDescriptionLength(char.about, 600);
+    const _transformCharacter = (char) => {
+        let descr = checkDescriptionLength(char.about, 180);
+        let about = checkDescriptionLength(char.about, 600);
 
-        let animeList = this.checkListLength(char.anime, 7);
-        let mangaList = this.checkListLength(char.manga, 7);
+        let animeList = checkListLength(char.anime, 7);
+        let mangaList = checkListLength(char.manga, 7);
 
         return {
             id: char.mal_id,
@@ -70,6 +63,8 @@ class JikanService {
             wiki: null,
         }
     }
+
+    return {loading, error, clearError, getCharacter, getAllCharacters}
 }
 
-export default JikanService;
+export default useJikanService;

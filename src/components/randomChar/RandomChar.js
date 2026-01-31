@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 
-import JikanService from '../../services/JikanService';
+import useJikanService from '../../services/JikanService';
 
 import Spinner from '../spinner/Spinner';
 import ErrorMessage from '../errorMessage/ErrorMessage';
@@ -11,37 +11,22 @@ import logo from '../../resources/img/logo.png';
 const RandomChar = () => {
     
     const [char, setChar] = useState({});
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(false);
 
-    const jikanService = new JikanService();
+    const {loading, error, clearError, getCharacter} = useJikanService();
 
     useEffect(() => {
         updateChar();
     }, [])
 
-    const onCharLoaded = (newChar) => {
-        setChar(char => newChar);
-        setLoading(loading => false);
-    }
-
-    const onCharLoading = () => {
-        setLoading(loading => true);
-        setError(error => false);
-    }
-
-    const onError = () => {
-        setLoading(loading => false);
-        setError(error => true);
+    const onCharLoaded = (char) => {
+        setChar(char);
     }
 
     const updateChar = () => {
         const id = Math.floor(Math.random() * (5000 - 1) + 1);
-        onCharLoading();
-        jikanService
-            .getCharacter(id)
+        clearError();
+        getCharacter(id)
             .then(onCharLoaded)
-            .catch(onError);
     }
 
     const errorMessage = error ? <ErrorMessage/> : null;

@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 
-import JikanService from '../../services/JikanService';
+import useJikanService from '../../services/JikanService';
 
 import Spinner from '../spinner/Spinner';
 import ErrorMessage from '../errorMessage/ErrorMessage';
@@ -10,27 +10,20 @@ import './charList.scss';
 const CharList = (props) => {
 
     const [charList, setCharList] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(false);
     const [newItemLoading, setNewItemLoading] = useState(false);
     const [page, setPage] = useState(1);
     const [charEnded, setCharEnded] = useState(false);
 
-    const jikanService = new JikanService();
+    const {loading, error, getAllCharacters} = useJikanService();
 
     useEffect(() => {
-        onRequest();
+        onRequest(page, true);
     }, [])
 
-    const onRequest = (page) => {
-        onCharListLoading();
-        jikanService.getAllCharacters(page)
+    const onRequest = (page, initial) => {
+        initial ? setNewItemLoading(false) : setNewItemLoading(true);
+        getAllCharacters(page)
             .then(onCharListLoaded)
-            .catch(onError)
-    }
-
-    const onCharListLoading = () => {
-        setNewItemLoading(true);
     }
 
     const onCharListLoaded = (newCharList) => {
@@ -40,15 +33,9 @@ const CharList = (props) => {
         }
 
         setCharList(charList => [...charList, ...newCharList])
-        setLoading(loading => false);
         setNewItemLoading(newItemLoading => false);
         setPage(page => page + 1);
         setCharEnded(charEnded => ended);
-    }
-
-    const onError = () => {
-        setLoading(loading => false);
-        setError(error => true);
     }
 
     const itemRefs = useRef([]);
@@ -91,14 +78,13 @@ const CharList = (props) => {
     const elements = renderItems(charList);
 
     const errorMessage = error ? <ErrorMessage/> : null;
-    const spinner = loading ? <Spinner/> : null;
-    const content = !(loading || error) ? elements : null;
+    const spinner = loading && !newItemLoading ? <Spinner/> : null;
 
     return (
         <div className="char__list">
             {errorMessage}
             {spinner}
-            {content}
+            {elements}
             <button 
                 className="button button__main button__long"
                 disabled={newItemLoading}
