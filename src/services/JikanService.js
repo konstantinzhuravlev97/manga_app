@@ -16,6 +16,16 @@ const useJikanService = () => {
         return _transformCharacter(res.data);
     }
 
+    const getAllManga = async (page = _basePage) => {
+        const res = await request(`${_apiBase}manga?limit=8&page=${page}`);
+        return res.data.map(_transformManga);
+    }
+
+    const getManga = async (id) => {
+        const res = await request(`${_apiBase}manga/${id}/full`);
+        return _transformManga(res.data);
+    }
+
     const checkDescriptionLength = (item, number) => {
         let res;
         if (item) {
@@ -44,27 +54,72 @@ const useJikanService = () => {
         return res;
     }
 
-    const _transformCharacter = (char) => {
-        let descr = checkDescriptionLength(char.about, 180);
-        let about = checkDescriptionLength(char.about, 600);
 
-        let animeList = checkListLength(char.anime, 7);
-        let mangaList = checkListLength(char.manga, 7);
+    const getTitle = (arr) => {
+        let title;
+        for (let i = 0; i < arr.length; i++) {
+            if (arr[i].type === 'English') {
+                title = arr[i].title;
+                break;
+            } else {
+                title = arr[0].title;
+            }
+
+        }
+        return title;
+    }
+
+    const getGenres = (arr) => {
+        let genres = '';
+        if (arr) {
+            arr.map(item => {
+                genres += `${item.name} / `;
+            })
+            genres = genres.slice(0, genres.length - 3);
+        } else {
+            genres = 'There is no information about this title genres'
+        }
+        return genres;
+    }
+
+    const _transformCharacter = (char) => {
+        // let descr = checkDescriptionLength(char.about, 180);
+        // let about = checkDescriptionLength(char.about, 600);
+
+        // let animeList = checkListLength(char.anime, 7);
+        // let mangaList = checkListLength(char.manga, 7);
 
         return {
             id: char.mal_id,
             name: char.name,
-            description: descr,
-            about: about,
+            description: checkDescriptionLength(char.about, 180),
+            about: checkDescriptionLength(char.about, 600),
             thumbnail: char.images.jpg.image_url,
-            anime: animeList,
-            manga: mangaList,
+            anime: checkListLength(char.anime, 7),
+            manga: checkListLength(char.manga, 7),
             homepage: char.url,
             wiki: null,
         }
     }
 
-    return {loading, error, clearError, getCharacter, getAllCharacters}
+    const _transformManga = (manga) => {
+
+        return {
+            id: manga.mal_id,
+            title: getTitle(manga.titles),
+            description: manga.synopsis,
+            status: manga.status,
+            genres: getGenres(manga.genres),
+            chapters: manga.chapters ? manga.chapters : 'no accurate information',
+            volumes: manga.volumes ? manga.volumes : 'no accurate information',
+            thumbnail: manga.images.jpg.image_url,
+            homepage: manga.url,
+            external: manga.external
+
+        }
+    }
+
+    return {loading, error, clearError, getCharacter, getAllCharacters, getAllManga, getManga}
 }
 
 export default useJikanService;

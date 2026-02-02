@@ -23,15 +23,15 @@ const RandomChar = () => {
     }
 
     const updateChar = () => {
-        const id = Math.floor(Math.random() * (5000 - 1) + 1);
         clearError();
+        const id = Math.floor(Math.random() * (5000 - 1) + 1);
         getCharacter(id)
             .then(onCharLoaded)
     }
 
     const errorMessage = error ? <ErrorMessage/> : null;
     const spinner = loading ? <Spinner/> : null;
-    const content = !(loading || error) ? <View char={char}/> : null;
+    const content = !(loading || error || !char) ? <View char={char}/> : null;
 
     return (
         <div className="randomchar">

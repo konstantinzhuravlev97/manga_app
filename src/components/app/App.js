@@ -1,42 +1,32 @@
-import { useState } from "react";
+import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 
 import AppHeader from "../appHeader/AppHeader";
-import RandomChar from "../randomChar/RandomChar";
-import CharList from "../charList/CharList";
-import CharInfo from "../charInfo/CharInfo";
 
-import ErrorBoundary from "../errorBoundary/ErrorBoundary";
+import SingleManga from "../singleManga/SingleManga";
 
-import decoration from '../../resources/img/girl.png';
+import MainPage from "../pages/MainPage";
+import MangaPage from "../pages/MangaPage";
+
 
 const App = () => {
 
-    const [selectedChar, setSelectedChar] = useState(null);
-
-
-    const onCharSelected = (id) => {
-        setSelectedChar(id);
-    }
-
     return (
-        <div className="app">
+        <Router>
+            <div className="app">
             <AppHeader/>
             <main>
-                <ErrorBoundary>
-                    <RandomChar/>
-                </ErrorBoundary>
-                <div className="char__content">
-                    <ErrorBoundary>
-                        <CharList onCharSelected={onCharSelected}/>
-                    </ErrorBoundary>
-                    <ErrorBoundary>
-                        <CharInfo charId={selectedChar}/>
-                    </ErrorBoundary>
-                    
-                </div>
-                <img className="bg-decoration" src={decoration} alt="girl"/>
+                <Switch>
+                    <Route exact path="/manga">
+                        <MangaPage/>
+                    </Route>
+                    <Route exact path="/">
+                        <MainPage/>
+                    </Route>
+                </Switch>
+                {/* <SingleManga/> */}
             </main>
         </div>
+        </Router>
     )
 
 
