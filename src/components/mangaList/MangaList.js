@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 
 import useJikanService from '../../services/JikanService';
 
@@ -47,11 +48,11 @@ const MangaList = () => {
                 <li className="manga__item"
                     key={item.id}
                     tabIndex={0}>
-                        <a href='#'>
+                        <Link to={`/manga/${item.id}`}>
                             <img src={item.thumbnail} alt={item.title} className="manga__item-img"/>
                             <div className="manga__item-name">{item.title}</div>
                             <div className="manga__item-status">{item.status}</div>
-                        </a>
+                        </Link>
                     </li>
                 )}
             )

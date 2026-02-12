@@ -16,6 +16,11 @@ const useJikanService = () => {
         return _transformCharacter(res.data);
     }
 
+    const getCharacterByName = async (name) => {
+        const res = await request(`${_apiBase}characters?q=${name}`);
+        return res.data.map(_transformCharacter);
+    }
+
     const getAllManga = async (page = _basePage) => {
         const res = await request(`${_apiBase}manga?limit=8&page=${page}`);
         return res.data.map(_transformManga);
@@ -24,6 +29,11 @@ const useJikanService = () => {
     const getManga = async (id) => {
         const res = await request(`${_apiBase}manga/${id}/full`);
         return _transformManga(res.data);
+    }
+
+    const getAnime = async (id) => {
+        const res = await request(`${_apiBase}anime/${id}/full`);
+        return _transformAnime(res.data);
     }
 
     const checkDescriptionLength = (item, number) => {
@@ -44,7 +54,7 @@ const useJikanService = () => {
         let res;
         if (item && item.length > 0) {
             if (item.length > number) {
-                res = item.slice(0, number);
+                res = item.slice(0, +number);
             } else {
                 res = item;
             }
@@ -107,19 +117,34 @@ const useJikanService = () => {
         return {
             id: manga.mal_id,
             title: getTitle(manga.titles),
-            description: manga.synopsis,
+            description: manga.synopsis ? manga.synopsis : 'There is no description about this title',
             status: manga.status,
             genres: getGenres(manga.genres),
             chapters: manga.chapters ? manga.chapters : 'no accurate information',
             volumes: manga.volumes ? manga.volumes : 'no accurate information',
             thumbnail: manga.images.jpg.image_url,
             homepage: manga.url,
-            external: manga.external
+        }
+    }
+
+    const _transformAnime = (anime) => {
+
+        return {
+            id: anime.mal_id,
+            title: getTitle(anime.titles),
+            description: anime.synopsis ? anime.synopsis : 'There is no description about this title',
+            year: anime.year ? anime.year : 'no accurate info',
+            trailer: anime.trailer,
+            status: anime.status,
+            genres: getGenres(anime.genres),
+            thumbnail: anime.images.jpg.image_url,
+            homepage: anime.url,
+            relations: anime.relations,
 
         }
     }
 
-    return {loading, error, clearError, getCharacter, getAllCharacters, getAllManga, getManga}
+    return {loading, error, clearError, getCharacter, getCharacterByName, getAllCharacters, getAllManga, getManga, getAnime}
 }
 
 export default useJikanService;

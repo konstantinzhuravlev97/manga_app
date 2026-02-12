@@ -53,9 +53,13 @@ const CharList = (props) => {
                 key={item.id}
                 tabIndex={0}
                 ref={el => itemRefs.current[i] = el}
-                onClick={() => {
-                    props.onCharSelected(item.id)
-                    focusOnItem(i)
+                onClick={(e) => {
+                    props.onCharSelected(item.id);
+                    focusOnItem(i);
+                    if (window.scrollY > '500') {
+                        e.currentTarget.parentElement.scrollIntoView({behavior: 'smooth', block: 'start'})
+                    }
+
                 }}
                 onKeyDown={(e) => {
                     if (e.key === ' ' || e.key === 'Enter') {

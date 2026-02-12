@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 
 import useJikanService from '../../services/JikanService';
 
@@ -60,7 +61,7 @@ const View = ({char}) => {
             animeList = anime.map(item => {
                 return (
                     <li key={item.anime.mal_id} className="char__comics-item">
-                        {item.anime.title}
+                        <Link to={`/anime/${item.anime.mal_id}`}>{item.anime.title}</Link>
                     </li>
                 )
             });
@@ -74,7 +75,7 @@ const View = ({char}) => {
             mangaList = manga.map(item => {
                 return (
                     <li key={item.manga.mal_id} className="char__comics-item">
-                        {item.manga.title}
+                        <Link to={`/manga/${item.manga.mal_id}`}>{item.manga.title}</Link>
                     </li>
                 )
             });

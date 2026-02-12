@@ -1,12 +1,16 @@
-import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
+import { lazy, Suspense } from "react";
+import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 
 import AppHeader from "../appHeader/AppHeader";
+import Spinner from "../spinner/Spinner";
 
-import SingleManga from "../singleManga/SingleManga";
-
-import MainPage from "../pages/MainPage";
-import MangaPage from "../pages/MangaPage";
-
+const MainPage = lazy(() => import('../pages/MainPage'))
+const MangaPage = lazy(() => import('../pages/MangaPage'))
+const SinglePage = lazy(() => import('../pages/SinglePage'))
+const SingleAnimeLayout = lazy(() => import('../pages/singleAnimeLayout/SingleAnimeLayout'))
+const SingleMangaLayout = lazy(() => import('../pages/singleMangaLayout/SingleMangaLayout'));
+const SingleCharacterLayout = lazy(() => import('../pages/singleCharacterLayout/SingleCharacterLayout'))
+const Page404 = lazy(() => import('../pages/404'));
 
 const App = () => {
 
@@ -15,15 +19,16 @@ const App = () => {
             <div className="app">
             <AppHeader/>
             <main>
-                <Switch>
-                    <Route exact path="/manga">
-                        <MangaPage/>
-                    </Route>
-                    <Route exact path="/">
-                        <MainPage/>
-                    </Route>
-                </Switch>
-                {/* <SingleManga/> */}
+                <Suspense fallback={<Spinner/>}>
+                    <Routes>
+                        <Route path="/manga" element={<MangaPage/>}/>
+                        <Route path="/anime/:id" element={<SinglePage Component={SingleAnimeLayout} dataType='anime'/>}/>
+                        <Route path="/manga/:id" element={<SinglePage Component={SingleMangaLayout} dataType='manga'/>}/>
+                        <Route path="/characters/:id" element={<SinglePage Component={SingleCharacterLayout} dataType='character'/>}/>
+                        <Route path="/" element={<MainPage/>}/>
+                        <Route path="*" element={<Page404/>}/>
+                    </Routes>  
+                </Suspense>
             </main>
         </div>
         </Router>
