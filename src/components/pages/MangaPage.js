@@ -1,14 +1,23 @@
-import { useState } from "react";
+import { Helmet } from "react-helmet";
 
 import MangaList from "../mangaList/MangaList";
+import AppBanner from "../appBanner/AppBanner";
 
 const MangaPage = () => {
 
-    const [selectedManga, setSelectedManga] = useState(null);
-    const [selectedAnime, setSelectedAnime] = useState(null);
-
     return (
-        <MangaList/>
+        <>
+            <Helmet>
+            <meta
+                    name="description"
+                    content="Page with list of manga"
+                    />
+                <title>Manga page</title>
+            </Helmet>
+            <AppBanner/>
+            <MangaList/>
+        </>
+        
     )
 }
 

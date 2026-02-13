@@ -40,6 +40,7 @@ const CharSearchForm = () => {
                 </Link>
                 <button
                     className="button button__secondary"
+                    disabled={charList.length === 1}
                     onClick={() => number < charList.length - 1 ? setNumber(number => number + 1) : setNumber(0)}
                     >
                     <div className='inner'>Try again</div>

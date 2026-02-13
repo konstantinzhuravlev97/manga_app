@@ -7,7 +7,7 @@ const useJikanService = () => {
     const _basePage = 1;
 
     const getAllCharacters = async (page = _basePage) => {
-        const res = await request(`${_apiBase}characters?limit=9&page=${page}`);
+        const res = await request(`${_apiBase}characters?order_by=favorites&sort=desc&limit=9&page=${page}`);
         return res.data.map(_transformCharacter);
     }
 
@@ -124,6 +124,7 @@ const useJikanService = () => {
             volumes: manga.volumes ? manga.volumes : 'no accurate information',
             thumbnail: manga.images.jpg.image_url,
             homepage: manga.url,
+            // relations: manga.relations
         }
     }
 

@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import { Helmet } from 'react-helmet';
 
 import './singleAnimeLayout.scss';
 
@@ -8,6 +9,13 @@ const SingleAnimeLayout = ({data}) => {
     
     return (
         <>
+            <Helmet>
+                <meta
+                    name="description"
+                    content={`${title} anime`}
+                    />
+                <title>{title}</title>
+            </Helmet>
             <div className="single-anime">
                 <img src={thumbnail} alt={title} className="single-anime__img"/>
                 <div className="single-anime__info">
@@ -27,8 +35,8 @@ const SingleAnimeLayout = ({data}) => {
             </div>
             <Link 
                 style={{'display': 'block',  'textAlign' : 'center', 'fontWeight': 'bold', 'fontSize': '24px', 'marginTop': '60px'}}
-                to="/anime"
-                >Back to anime list</Link>
+                to="/"
+                >Back to main page</Link>
         </>
     )
 }

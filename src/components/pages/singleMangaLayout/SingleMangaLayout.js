@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import { Helmet } from 'react-helmet';
 
 import './singleMangaLayout.scss';
 
@@ -8,6 +9,13 @@ const {title, description, status, genres, chapters, volumes, thumbnail} = data;
 
     return (
         <>
+            <Helmet>
+                <meta
+                    name="description"
+                    content={`${title} manga`}
+                    />
+                <title>{title}</title>
+            </Helmet>
             <div className="single-manga">
                 <img src={thumbnail} alt={title} className="single-manga__img"/>
                 <div className="single-manga__info">

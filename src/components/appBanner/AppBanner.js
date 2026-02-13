@@ -1,14 +1,12 @@
+import banner from '../../resources/img/banner.jpg';
+
 import './appBanner.scss';
 
 
 const AppBanner = () => {
     return (
         <div className="app__banner">
-            {/* <img src={} alt=""/>
-            <div className="app__banner-text">
-                
-            </div>
-            <img src={} alt=""/> */}
+            <img src={banner} alt="banner"/>
         </div>
     )
 }

@@ -5,6 +5,7 @@ import useJikanService from "../../services/JikanService";
 
 import Spinner from "../spinner/Spinner";
 import ErrorMessage from "../errorMessage/ErrorMessage";
+import AppBanner from "../appBanner/AppBanner";
 
 
 const SinglePage = ({Component, dataType}) => {
@@ -42,6 +43,7 @@ const SinglePage = ({Component, dataType}) => {
 
     return(
         <>
+            <AppBanner/>
             {errorMessage}
             {spinner}
             {content}
