@@ -1,7 +1,9 @@
 import { useState, useEffect, useRef } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 
 import useJikanService from '../../services/JikanService';
 
+import { charactersFetching, charactersFetched, charactersFetchingError, characterSelectedId} from '../../actions';
 import Spinner from '../spinner/Spinner';
 import ErrorMessage from '../errorMessage/ErrorMessage';
 
@@ -9,34 +11,52 @@ import './charList.scss';
 
 const CharList = (props) => {
 
-    const [charList, setCharList] = useState([]);
+    // const [charList, setCharList] = useState([]);
     const [newItemLoading, setNewItemLoading] = useState(false);
-    const [page, setPage] = useState(1);
-    const [charEnded, setCharEnded] = useState(false);
+    // const [page, setPage] = useState(1);
+    // const [charEnded, setCharEnded] = useState(false);
 
     const {loading, error, getAllCharacters} = useJikanService();
+    const {charactersList, charactersLoadingStatus, listPage, charactersEnded} = useSelector(state => state.characters)
+    const dispatch = useDispatch();
+
 
     useEffect(() => {
-        onRequest(page, true);
+        dispatch(charactersFetching());
+        // getAllCharacters(listPage)
+        //     .then(data => dispatch(charactersFetched(data)))
+        //     .catch(() => dispatch(charactersFetchingError))
+        onRequest(listPage, true);
     }, [])
 
     const onRequest = (page, initial) => {
         initial ? setNewItemLoading(false) : setNewItemLoading(true);
         getAllCharacters(page)
-            .then(onCharListLoaded)
+            // .then(onCharListLoaded)
+            .then(data => dispatch(charactersFetched(data)))
+            .then(data => onCharListLoaded(data.payload))
+            .catch(() => dispatch(charactersFetchingError))
     }
 
-    const onCharListLoaded = (newCharList) => {
-        let ended = false;
-        if (newCharList.length < 9) {
-            ended = true;
+    const onCharListLoaded = (data) => {
+        if (data.length < 9) {
+            dispatch(charactersEnded())
         }
 
-        setCharList(charList => [...charList, ...newCharList])
         setNewItemLoading(newItemLoading => false);
-        setPage(page => page + 1);
-        setCharEnded(charEnded => ended);
     }
+
+    // const onCharListLoaded = (newCharList) => {
+    //     let ended = false;
+    //     if (newCharList.length < 9) {
+    //         ended = true;
+    //     }
+
+    //     setCharList(charList => [...charList, ...newCharList])
+    //     setNewItemLoading(newItemLoading => false);
+    //     setPage(page => page + 1);
+    //     setCharEnded(charEnded => ended);
+    // }
 
     const itemRefs = useRef([]);
 
@@ -54,7 +74,8 @@ const CharList = (props) => {
                 tabIndex={0}
                 ref={el => itemRefs.current[i] = el}
                 onClick={(e) => {
-                    props.onCharSelected(item.id);
+                    // props.onCharSelected(item.id);
+                    dispatch(characterSelectedId(item.id))
                     focusOnItem(i);
                     if (window.scrollY > '500') {
                         e.currentTarget.parentElement.scrollIntoView({behavior: 'smooth', block: 'start'})
@@ -63,7 +84,8 @@ const CharList = (props) => {
                 }}
                 onKeyDown={(e) => {
                     if (e.key === ' ' || e.key === 'Enter') {
-                        props.onCharSelected(item.id);
+                        // props.onCharSelected(item.id);
+                        dispatch(characterSelectedId(item.id))
                         focusOnItem(i);
                     }
                 }}>
@@ -79,21 +101,27 @@ const CharList = (props) => {
         );
     }
 
-    const elements = renderItems(charList);
+    const elements = renderItems(charactersList);
 
-    const errorMessage = error ? <ErrorMessage/> : null;
-    const spinner = loading && !newItemLoading ? <Spinner/> : null;
+    // const errorMessage = error ? <ErrorMessage/> : null;
+    // const spinner = loading && !newItemLoading ? <Spinner/> : null;
+
+    if (charactersLoadingStatus === 'loading') {
+        return <Spinner/>
+    }   else if (charactersLoadingStatus === 'error') {
+        return <ErrorMessage/>
+    }
 
     return (
         <div className="char__list">
-            {errorMessage}
-            {spinner}
+            {/* {errorMessage}
+            {spinner} */}
             {elements}
             <button 
                 className="button button__main button__long"
                 disabled={newItemLoading}
-                style={{'display': charEnded ? 'none' : 'block'}}
-                onClick={() => onRequest(page)}>
+                style={{'display': charactersEnded ? 'none' : 'block'}}
+                onClick={() => onRequest(listPage)}>
                 <div className="inner">load more</div>
             </button>
         </div>

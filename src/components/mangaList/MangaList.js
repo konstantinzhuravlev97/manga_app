@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
 
 import useJikanService from '../../services/JikanService';
+import { mangaListFetching, mangaListFetched, mangaListFetchingError, mangaListEnded } from '../../actions';
 
 import Spinner from '../spinner/Spinner';
 import ErrorMessage from '../errorMessage/ErrorMessage';
@@ -11,36 +13,51 @@ import './mangaList.scss';
 
 const MangaList = () => {
 
-    const [mangaList, setMangaList] = useState([]);
+    // const [mangaList, setMangaList] = useState([]);
     const [newItemLoading, setNewItemLoading] = useState(false);
-    const [page, setPage] = useState(1);
-    const [mangaEnded, setMangaEnded] = useState(false);
+    // const [page, setPage] = useState(1);
+    // const [mangaEnded, setMangaEnded] = useState(false);
+
 
     const {loading, error, getAllManga} = useJikanService();
+    const {mangaList, mangaLoadingStatus, listPage, mangaEnded} = useSelector(state => state.manga)
+    const dispatch = useDispatch();
 
 
     useEffect(() => {
-        onRequest(page, true);
+        dispatch(mangaListFetching())
+        onRequest(listPage, true);
         
     }, []);
 
     const onRequest = (page, initial) =>{
         initial ? setNewItemLoading(false) : setNewItemLoading(true);
         getAllManga(page)
-            .then(onMangaLoaded)
+            // .then(onMangaLoaded)
+            .then(data => dispatch(mangaListFetched(data)))
+            .then(data => onMangaLoaded(data.payload))
+            .catch(() => dispatch(mangaListFetchingError))
     }
 
-    const onMangaLoaded = (newMangaList) => {
-        let ended = false;
-        if (newMangaList < 8) {
-            ended = true;
+    const onMangaLoaded = (data) => {
+        if (data.length < 8) {
+            dispatch(mangaListEnded())
         }
 
-        setMangaList(mangaList => [...mangaList, ...newMangaList]);
         setNewItemLoading(newItemLoading => false);
-        setPage(page => page + 1);
-        setMangaEnded(mangaEnded => ended);
     }
+
+    // const onMangaLoaded = (newMangaList) => {
+    //     let ended = false;
+    //     if (newMangaList < 8) {
+    //         ended = true;
+    //     }
+
+    //     setMangaList(mangaList => [...mangaList, ...newMangaList]);
+    //     setNewItemLoading(newItemLoading => false);
+    //     setPage(page => page + 1);
+    //     setMangaEnded(mangaEnded => ended);
+    // }
 
     function renderItems(arr) {
         const items = arr.map((item) => {
@@ -63,22 +80,28 @@ const MangaList = () => {
         )   
     }
 
-    const errorMessage = error ? <ErrorMessage/> : null;
-    const spinner = loading && !newItemLoading ? <Spinner/> : null;
+    // const errorMessage = error ? <ErrorMessage/> : null;
+    // const spinner = loading && !newItemLoading ? <Spinner/> : null;
 
     let elements = renderItems(mangaList);
+
+    if (mangaLoadingStatus === 'loading') {
+        return <Spinner/>
+    }   else if (mangaLoadingStatus === 'error') {
+        return <ErrorMessage/>
+    }
 
     return (
 
         <div className="manga__list">
-            {errorMessage}
-            {spinner}
+            {/* {errorMessage}
+            {spinner} */}
             {elements}
             <button 
                 className="button button__main button__long"
                 disabled={newItemLoading}
                 style={{'display': mangaEnded ? 'none' : 'block'}}
-                onClick={() => onRequest(page)}>
+                onClick={() => onRequest(listPage)}>
                 <div className="inner">load more</div>
             </button>
         </div>
