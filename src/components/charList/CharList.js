@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 
 import useJikanService from '../../services/JikanService';
 
-import { charactersFetching, charactersFetched, charactersFetchingError, characterSelectedId} from '../../actions';
+import { charactersFetching, fetchCharacters} from '../../actions';
 import Spinner from '../spinner/Spinner';
 import ErrorMessage from '../errorMessage/ErrorMessage';
 
@@ -16,7 +16,7 @@ const CharList = (props) => {
     // const [page, setPage] = useState(1);
     // const [charEnded, setCharEnded] = useState(false);
 
-    const {loading, error, getAllCharacters} = useJikanService();
+    const {getAllCharacters} = useJikanService();
     const {charactersList, charactersLoadingStatus, listPage, charactersEnded} = useSelector(state => state.characters)
     const dispatch = useDispatch();
 
@@ -31,18 +31,18 @@ const CharList = (props) => {
 
     const onRequest = (page, initial) => {
         initial ? setNewItemLoading(false) : setNewItemLoading(true);
-        getAllCharacters(page)
-            // .then(onCharListLoaded)
-            .then(data => dispatch(charactersFetched(data)))
-            .then(data => onCharListLoaded(data.payload))
-            .catch(() => dispatch(charactersFetchingError))
+        dispatch(fetchCharacters(getAllCharacters, page, onCharListLoaded));
+        // getAllCharacters(page)
+        //     .then(onCharListLoaded)
+        //     .then(data => dispatch(charactersFetched(data)))
+        //     .then(data => onCharListLoaded(data.payload))
+        //     .catch(() => dispatch(charactersFetchingError))
     }
 
     const onCharListLoaded = (data) => {
         if (data.length < 9) {
             dispatch(charactersEnded())
         }
-
         setNewItemLoading(newItemLoading => false);
     }
 
@@ -74,8 +74,7 @@ const CharList = (props) => {
                 tabIndex={0}
                 ref={el => itemRefs.current[i] = el}
                 onClick={(e) => {
-                    // props.onCharSelected(item.id);
-                    dispatch(characterSelectedId(item.id))
+                    props.onCharSelected(item.id);
                     focusOnItem(i);
                     if (window.scrollY > '500') {
                         e.currentTarget.parentElement.scrollIntoView({behavior: 'smooth', block: 'start'})
@@ -84,8 +83,7 @@ const CharList = (props) => {
                 }}
                 onKeyDown={(e) => {
                     if (e.key === ' ' || e.key === 'Enter') {
-                        // props.onCharSelected(item.id);
-                        dispatch(characterSelectedId(item.id))
+                        props.onCharSelected(item.id);
                         focusOnItem(i);
                     }
                 }}>

@@ -1,11 +1,8 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { useDispatch, useSelector } from 'react-redux';
-import { createSelector } from 'reselect';
 
 import useJikanService from '../../services/JikanService';
 
-import { characterSelected, characterSelectedId } from '../../actions';
 import Spinner from '../spinner/Spinner';
 import ErrorMessage from '../errorMessage/ErrorMessage';
 import Skeleton from '../skeleton/Skeleton';
@@ -17,44 +14,37 @@ const CharInfo = (props) =>  {
     const [char, setChar] = useState(null);
 
     const {loading, error, clearError, getCharacter} = useJikanService();
-    const {selectedCharacter, selectedCharacterId} = useSelector(state => state.characters);
-    
-    const dispatch = useDispatch();
+
 
     useEffect(() => {
-        updateChar(selectedCharacterId);
-    }, [selectedCharacterId])
+        updateChar();
+    }, [props.charId])
 
-    // const onCharLoaded = (char) => {
-    //     setChar(char);
-    // }
+    const onCharLoaded = (char) => {
+        setChar(char);
+    }
 
-    const updateChar = (id) => {
-        // const {charId} = props;
-        // if (!charId) {
-        //     return;
-        // }
-        if (!id) {
-            return
+    const updateChar = () => {
+        const {charId} = props;
+        if (!charId) {
+            return;
         }
 
         clearError();
-        getCharacter(id)
-            // .then(onCharLoaded)
-            .then(data => console.log(data))
-            // .then(data => dispatch(characterSelected))
+        getCharacter(charId)
+            .then(onCharLoaded)
     }
 
     const skeleton = !(error || loading || char) ? <Skeleton/> : null;
-    // const errorMessage = error ? <ErrorMessage/> : null;
-    // const spinner = loading ? <Spinner/> : null;
-    const content = !(error || loading || !char) ? <View char={selectedCharacter}/> : null;
+    const errorMessage = error ? <ErrorMessage/> : null;
+    const spinner = loading ? <Spinner/> : null;
+    const content = !(error || loading || !char) ? <View char={char}/> : null;
 
     return (
         <div className="char__info">
             {skeleton}
-            {/* {errorMessage}
-            {spinner} */}
+            {errorMessage}
+            {spinner}
             {content}
         </div>
     )

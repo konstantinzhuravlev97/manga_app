@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 
 import useJikanService from '../../services/JikanService';
-import { mangaListFetching, mangaListFetched, mangaListFetchingError, mangaListEnded } from '../../actions';
+import { mangaListFetching, mangaListEnded, fetchManga } from '../../actions';
 
 import Spinner from '../spinner/Spinner';
 import ErrorMessage from '../errorMessage/ErrorMessage';
@@ -19,7 +19,7 @@ const MangaList = () => {
     // const [mangaEnded, setMangaEnded] = useState(false);
 
 
-    const {loading, error, getAllManga} = useJikanService();
+    const {getAllManga} = useJikanService();
     const {mangaList, mangaLoadingStatus, listPage, mangaEnded} = useSelector(state => state.manga)
     const dispatch = useDispatch();
 
@@ -32,18 +32,18 @@ const MangaList = () => {
 
     const onRequest = (page, initial) =>{
         initial ? setNewItemLoading(false) : setNewItemLoading(true);
-        getAllManga(page)
-            // .then(onMangaLoaded)
-            .then(data => dispatch(mangaListFetched(data)))
-            .then(data => onMangaLoaded(data.payload))
-            .catch(() => dispatch(mangaListFetchingError))
+        dispatch(fetchManga(getAllManga, page, onMangaLoaded));
+        // getAllManga(page)
+        //     .then(onMangaLoaded)
+        //     .then(data => dispatch(mangaListFetched(data)))
+        //     .then(data => onMangaLoaded(data.payload))
+        //     .catch(() => dispatch(mangaListFetchingError))
     }
 
     const onMangaLoaded = (data) => {
         if (data.length < 8) {
             dispatch(mangaListEnded())
         }
-
         setNewItemLoading(newItemLoading => false);
     }
 

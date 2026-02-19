@@ -1,3 +1,17 @@
+export const fetchCharacters = (request, page, method) => (dispatch) => {
+    request(page)
+        .then(data => dispatch(charactersFetched(data)))
+        .then(data => method(data.payload))
+        .catch(() => dispatch(charactersFetchingError))
+}
+
+export const fetchManga = (request, page, method) => (dispatch) => {
+    request(page)
+        .then(data => dispatch(mangaListFetched(data)))
+        .then(data => method(data.payload))
+        .catch(() => dispatch(mangaListFetchingError))
+}
+
 export const charactersFetching = () => {
     return {
         type: 'CHARACTERS_FETCHING'
@@ -23,19 +37,19 @@ export const charactersEnded = () => {
     }
 }
 
-export const characterSelected = (character) => {
-    return {
-        type: 'CHARACTER_SELECTED',
-        payload: character
-    }
-}
+// export const characterSelected = (character) => {
+//     return {
+//         type: 'CHARACTER_SELECTED',
+//         payload: character
+//     }
+// }
 
-export const characterSelectedId = (id) => {
-    return {
-        type: 'CHARACTER_SELECTED_ID',
-        payload: id
-    }
-}
+// export const characterSelectedId = (id) => {
+//     return {
+//         type: 'CHARACTER_SELECTED_ID',
+//         payload: id
+//     }
+// }
 
 export const mangaListFetching = () => {
     return {
@@ -73,5 +87,24 @@ export const mangaListEnded = () => {
 //     return {
 //         type: 'MANGA_SELECTED_ID',
 //         payload: id
+//     }
+// }
+
+// export const animeFetching = () => {
+//     return {
+//         type: 'ANIME_FETCHING'
+//     }
+// }
+
+// export const animeFetched = (anime) => {
+//     return {
+//         type: 'ANIME_FETCHED',
+//         payload: anime
+//     }
+// }
+
+// export const animeFetchingError = () => {
+//     return {
+//         type: 'ANIME_FETCHING_ERROR'
 //     }
 // }

@@ -3,8 +3,6 @@ const initialState = {
     charactersLoadingStatus: 'idle',
     listPage: 1,
     charactersEnded: false,
-    selectedCharacter: null,
-    selectedCharacterId: null,
 }
 
 const characters = (state = initialState, action) => {
@@ -30,16 +28,6 @@ const characters = (state = initialState, action) => {
             return {
                 ...state,
                 charactersEnded: true
-            }
-        case 'CHARACTER_SELECTED':
-            return {
-                ...state,
-                selectedCharacter: action.payload
-            }
-        case 'CHARACTER_SELECTED_ID':
-            return {
-                ...state,
-                selectedCharacterId: action.payload
             }
         default: return state
     }

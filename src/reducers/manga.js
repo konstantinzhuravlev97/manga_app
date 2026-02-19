@@ -2,9 +2,8 @@ const initialState = {
     mangaList: [],
     mangaLoadingStatus: 'idle',
     listPage: 1,
-    mangaEnded: false,
-    selectedManga: null,
-    selectedMangaId: null,
+    mangaEnded: false
+
 }
 
 const manga = (state = initialState, action) => {
@@ -31,16 +30,6 @@ const manga = (state = initialState, action) => {
                 ...state,
                 mangaEnded: true
             }
-        // case 'MANGA_SELECTED':
-        //     return {
-        //         ...state,
-        //         selectedManga: action.payload
-        //     }
-        // case 'MANGA_SELECTED_ID':
-        //     return {
-        //         ...state,
-        //         selectedMangaId: action.payload
-        //     }
         default: return state
     }
 }
