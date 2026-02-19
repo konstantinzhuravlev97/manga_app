@@ -3,7 +3,8 @@ import { useDispatch, useSelector } from 'react-redux';
 
 import useJikanService from '../../services/JikanService';
 
-import { charactersFetching, fetchCharacters} from '../../actions';
+import { charactersFetching, charactersEnded, resetCharacters} from './charactersSlice';
+import { fetchCharacters} from '../../actions';
 import Spinner from '../spinner/Spinner';
 import ErrorMessage from '../errorMessage/ErrorMessage';
 
@@ -17,16 +18,21 @@ const CharList = (props) => {
     // const [charEnded, setCharEnded] = useState(false);
 
     const {getAllCharacters} = useJikanService();
-    const {charactersList, charactersLoadingStatus, listPage, charactersEnded} = useSelector(state => state.characters)
+    const {charactersList, charactersLoadingStatus, listPage, charactersListEnded} = useSelector(state => state.characters)
     const dispatch = useDispatch();
 
 
     useEffect(() => {
         dispatch(charactersFetching());
+        // dispatch(fetchCharacters(getAllCharacters, page))
         // getAllCharacters(listPage)
         //     .then(data => dispatch(charactersFetched(data)))
         //     .catch(() => dispatch(charactersFetchingError))
         onRequest(listPage, true);
+
+        return () => {
+            dispatch(resetCharacters());
+        }
     }, [])
 
     const onRequest = (page, initial) => {
@@ -118,7 +124,7 @@ const CharList = (props) => {
             <button 
                 className="button button__main button__long"
                 disabled={newItemLoading}
-                style={{'display': charactersEnded ? 'none' : 'block'}}
+                style={{'display': charactersListEnded ? 'none' : 'block'}}
                 onClick={() => onRequest(listPage)}>
                 <div className="inner">load more</div>
             </button>

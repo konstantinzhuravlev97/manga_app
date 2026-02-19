@@ -1,9 +1,10 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect} from 'react';
 import { Link } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 
 import useJikanService from '../../services/JikanService';
-import { mangaListFetching, mangaListEnded, fetchManga } from '../../actions';
+import { fetchManga} from '../../actions';
+import { mangaFetching, mangaEnded, resetManga } from './mangaSlice';
 
 import Spinner from '../spinner/Spinner';
 import ErrorMessage from '../errorMessage/ErrorMessage';
@@ -20,15 +21,27 @@ const MangaList = () => {
 
 
     const {getAllManga} = useJikanService();
-    const {mangaList, mangaLoadingStatus, listPage, mangaEnded} = useSelector(state => state.manga)
+    const {mangaList, mangaLoadingStatus, listPage, mangaListEnded} = useSelector(state => state.manga)
     const dispatch = useDispatch();
 
 
     useEffect(() => {
-        dispatch(mangaListFetching())
+        dispatch(mangaFetching())
         onRequest(listPage, true);
+
+        return () => {
+            dispatch(resetManga());
+        }
         
     }, []);
+
+    const onMangaLoaded = (data) => {
+        if (data.length < 8) {
+            dispatch(mangaEnded())
+        }
+        // setPage(page => page + 1);
+        setNewItemLoading(newItemLoading => false);
+    }
 
     const onRequest = (page, initial) =>{
         initial ? setNewItemLoading(false) : setNewItemLoading(true);
@@ -38,14 +51,11 @@ const MangaList = () => {
         //     .then(data => dispatch(mangaListFetched(data)))
         //     .then(data => onMangaLoaded(data.payload))
         //     .catch(() => dispatch(mangaListFetchingError))
-    }
+    };
 
-    const onMangaLoaded = (data) => {
-        if (data.length < 8) {
-            dispatch(mangaListEnded())
-        }
-        setNewItemLoading(newItemLoading => false);
-    }
+
+
+
 
     // const onMangaLoaded = (newMangaList) => {
     //     let ended = false;
@@ -100,8 +110,9 @@ const MangaList = () => {
             <button 
                 className="button button__main button__long"
                 disabled={newItemLoading}
-                style={{'display': mangaEnded ? 'none' : 'block'}}
-                onClick={() => onRequest(listPage)}>
+                style={{'display': mangaListEnded ? 'none' : 'block'}}
+                onClick={() => {
+                    onRequest(listPage)}}>
                 <div className="inner">load more</div>
             </button>
         </div>

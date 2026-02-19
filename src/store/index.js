@@ -1,8 +1,8 @@
-import { legacy_createStore as createStore, combineReducers, compose, applyMiddleware } from 'redux';
-import {thunk} from 'redux-thunk';
+import { configureStore } from '@reduxjs/toolkit';
 
-import characters from '../reducers/characters';
-import manga from '../reducers/manga';
+import characters from '../components/charList/charactersSlice';
+import manga from '../components/mangaList/mangaSlice';
+
 
 const stringMiddleware = (store) => (dispatch) => (action) => {
     if (typeof action === 'string') {
@@ -13,12 +13,18 @@ const stringMiddleware = (store) => (dispatch) => (action) => {
     return dispatch(action)
 };
 
-const store = createStore(
-                        combineReducers({characters, manga}),
-                        compose(
-                            applyMiddleware(thunk, stringMiddleware),
-                            window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__()
-                        )
-                    );
+// const store = createStore(
+//                         combineReducers({characters, manga}),
+//                         compose(
+//                             applyMiddleware(thunk, stringMiddleware),
+//                             window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__()
+//                         )
+//                     );
+
+const store = configureStore({
+    reducer: {characters, manga},
+    middleware: getDefaultMiddleware => getDefaultMiddleware().concat(stringMiddleware),
+    devTools: process.env.NODE_ENV !== 'production'
+});
 
 export default store;
