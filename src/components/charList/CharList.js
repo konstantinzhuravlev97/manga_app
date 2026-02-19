@@ -1,13 +1,15 @@
 import { useState, useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { createSelector } from '@reduxjs/toolkit';
 
 import useJikanService from '../../services/JikanService';
 
-import { charactersFetching, charactersEnded, resetCharacters} from './charactersSlice';
+import { selectAll, charactersFetching, charactersEnded, resetCharacters} from './charactersSlice';
 import { fetchCharacters} from '../../actions';
 import Spinner from '../spinner/Spinner';
 import ErrorMessage from '../errorMessage/ErrorMessage';
 
+import store from "../../store";
 import './charList.scss';
 
 const CharList = (props) => {
@@ -18,9 +20,9 @@ const CharList = (props) => {
     // const [charEnded, setCharEnded] = useState(false);
 
     const {getAllCharacters} = useJikanService();
-    const {charactersList, charactersLoadingStatus, listPage, charactersListEnded} = useSelector(state => state.characters)
+    const { charactersLoadingStatus, listPage, charactersListEnded} = useSelector(state => state.characters)
+    const charactersList = selectAll(store.getState());
     const dispatch = useDispatch();
-
 
     useEffect(() => {
         dispatch(charactersFetching());

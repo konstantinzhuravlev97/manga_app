@@ -1,11 +1,19 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { createSlice, createEntityAdapter } from "@reduxjs/toolkit";
 
-const initialState = {
-    charactersList: [],
+const charactersAdapter = createEntityAdapter();
+
+// const initialState = {
+//     charactersList: [],
+//     charactersLoadingStatus: 'idle',
+//     charactersListEnded: false,
+//     listPage: 1
+// }
+
+const initialState = charactersAdapter.getInitialState({
     charactersLoadingStatus: 'idle',
     charactersListEnded: false,
     listPage: 1
-}
+});
 
 const charactersSlice = createSlice({
     name: 'characters',
@@ -14,7 +22,8 @@ const charactersSlice = createSlice({
         charactersFetching: state => {state.charactersLoadingStatus = 'loading'},
         charactersFetched: (state, action) => {
             state.charactersLoadingStatus = 'idle';
-            state.charactersList.push(...action.payload);
+            charactersAdapter.setMany(state, action.payload)
+            // state.charactersList.push(...action.payload);
             state.listPage += 1;
         },
         charactersFetchingError: state => {state.charactersLoadingStatus = 'error'},
@@ -26,6 +35,8 @@ const charactersSlice = createSlice({
 const {actions, reducer} = charactersSlice;
 
 export default reducer;
+
+export const {selectAll} = charactersAdapter.getSelectors(state => state.characters);
 
 export const {
     charactersFetching,
